@@ -1,0 +1,190 @@
+1A
+def insertion_sort(arr): 
+    for i in range(1, len(arr)): 
+        key = arr[i] 
+        j = i - 1
+        while j >= 0 and arr[j] > key:
+            arr[j + 1] = arr[j]
+            j -= 1 
+        arr[j + 1] = key 
+numbers = [5, 2, 9, 1, 5, 6] 
+print("Original list:", numbers)
+insertion_sort(numbers) 
+print("Sorted list:", numbers)
+
+2A
+def dfs_rec(graph,vertex,visited):
+    visited[vertex] = True
+    print(vertex)
+    for neighbour in graph[vertex]:
+        if not visited[neighbour]:
+            dfs_rec(graph,neighbour,visited)  
+graph = {
+    0:[1,2,3],
+    1:[2,4],
+    2:[4],
+    3:[4],
+    4:[]
+}
+
+num_vertices=len(graph)
+visited=[False]*num_vertices
+print("DFS Traversal: ")
+dfs_rec(graph,0,visited)
+
+3A
+def count_inversions(arr): 
+    n = len(arr) 
+    inversions = 0
+    for i in range(n):
+        for j in range(i + 1, n):
+            if arr[i] > arr[j]:
+                inversions += 1
+    return inversions 
+arr = [4,2,3,1] 
+inversions = count_inversions(arr) 
+print("Number of inversions:", inversions)
+
+4A
+def quicksort(arr):
+    if len(arr) <=1:
+        return arr
+    pivot = arr[len(arr)//2]
+    left = [x for x in arr if x<pivot]
+    middle = [x for x in arr if x==pivot]
+    right = [x for x in arr if x>pivot]
+    return quicksort(left) + middle + quicksort(right)  
+numbers = [38, 27, 43, 3, 9, 82, 10] # Perform Quicksort 
+sorted_numbers = quicksort(numbers) # Print the sorted list 
+print("Sorted list:", sorted_numbers)
+
+5A
+import heapq
+def prim(graph):
+    mst=set()
+    startv=next(iter(graph))
+    mst.add(startv)
+    mincost=0
+    pq=[(cost, startv, vertex) for vertex, cost in graph[startv].items()]
+    heapq.heapify(pq)
+    while pq:
+        cost, u, v = heapq.heappop(pq)
+        if v not in mst:
+            mst.add(v)
+            mincost +=cost
+            for vertex, edgecost in graph[v].items():
+                if vertex not in mst:
+                    heapq.heappush(pq,(edgecost, v, vertex))
+    return mincost
+
+graph = { 'A': {'B': 2, 'C': 4},
+          'B': {'A': 2, 'C': 1, 'D': 7},
+          'C': {'A': 4, 'B': 1, 'D': 3}, 
+          'D': {'B': 7, 'C': 3} }        
+mincost = prim(graph) 
+print("Minimum Cost:", mincost)
+
+
+---------------------------------------------------------------------------------------------------------
+1B
+def gale_shapley(men_preferences, women_preferences):
+     n = len(men_preferences) 
+     engaged = {} 
+     men_free = set(range(n)) 
+     while men_free: 
+        m = men_free.pop() 
+        w = men_preferences[m].pop(0) 
+        if w not in engaged: 
+            engaged[w] = m 
+        else:
+             m1 = engaged[w] 
+             w_prefs = women_preferences[w]
+             if w_prefs.index(m) < w_prefs.index(m1):
+                 engaged[w] = m 
+                 men_free.add(m1) 
+             else: 
+                men_free.add(m)
+     return engaged 
+men_preferences = { 0: [1, 0, 2, 3], 
+1: [0, 1, 2, 3], 
+2: [0, 1, 2, 3], 
+3: [1, 0, 2, 3] } 
+women_preferences = { 0: [1, 0, 2, 3], 
+1: [0, 1, 2, 3], 
+2: [1, 0, 2, 3], 
+3: [1, 0, 2, 3] } 
+stable_matching = gale_shapley(men_preferences, women_preferences) 
+   
+for woman, man in stable_matching.items(): 
+    print("Man ",man, "is engaged to Woman", woman)
+
+3B
+import heapq 
+def dijkstra(graph, start): 
+    distances = {node: float('inf') for node in graph}
+    distances[start] = 0 
+    priority_queue = [(0, start)]
+    while priority_queue:
+        current_distance, current_node = heapq.heappop(priority_queue)
+        if current_distance > distances[current_node]:
+             continue
+        for neighbor, weight in graph[current_node].items():
+             distance = current_distance + weight
+             if distance < distances[neighbor]: 
+                distances[neighbor] = distance
+                heapq.heappush(priority_queue, (distance, neighbor))
+    return distances 
+graph = { 'A': {'B': 1, 'C': 4}, 
+'B': {'A': 1, 'C': 3, 'D': 2}, 
+'C': {'A': 4, 'B': 3, 'D': 5}, 
+'D': {'B': 2, 'C': 5} } 
+start_node = 'A' 
+shortest_distances = dijkstra(graph, start_node)
+print("Shortest distances from node", start_node + ":", shortest_distances)
+
+
+5B
+def drama_venue_allocation(requests): 
+    requests.sort(key=lambda x: x[1])
+    prev_profit = curr_profit = 0 
+    for start_time, finish_time, profit in requests:
+         max_profit = max(prev_profit + profit, curr_profit) 
+         prev_profit, curr_profit = curr_profit, max_profit
+    return curr_profit 
+requests = [(1, 2, 100), (2, 5, 200), 
+(3, 6, 300 ), (4, 8, 400),(5,9,500),(6,10,100)] 
+max_profit = drama_venue_allocation(requests) 
+print("Maximum Profit:", max_profit)
+
+6B
+def knapsack(values, weights, capacity):
+     n = len(values)
+     dp = [0] * (capacity + 1)
+     for i in range(n): 
+        for w in range(capacity, weights[i] - 1, -1):
+             dp[w] = max(dp[w], values[i] + dp[w - weights[i]])
+     return dp[capacity] 
+values = [10,4,9,11] 
+weights = [3,5,6,2] 
+capacity = 7
+
+max_value = knapsack(values, weights, capacity) 
+print("Maximum value:", max_value)
+
+
+7B
+def bellman_ford(vertices, edges, start): 
+    distances = {v: float('inf') for v in vertices}
+    distances[start] = 0
+    for _ in vertices: 
+        for u, v, weight in edges:
+             if distances[u] + weight < distances[v]: 
+                distances[v] = distances[u] + weight
+    return distances 
+vertices = ['A', 'B', 'C', 'D', 'E','F']
+edges = [('A', 'B', -4), ('B', 'E', -2),
+('B', 'D', -1), ('D', 'A', 6), ('A', 'F', -3), 
+('D', 'F', 4), ('E', 'F', 2),('C','B',8),('C','F',3)] 
+start_vertex = 'A' 
+shortest_distances = bellman_ford(vertices, edges, start_vertex) 
+print("Shortest distances from vertex", start_vertex + ":", shortest_distances)
